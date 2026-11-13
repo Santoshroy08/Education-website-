@@ -1,0 +1,13 @@
+[
+  {
+    "loginId": "TK-2601",
+    "fullName": "Santosh",
+    "email": "aaaaf@gamil.com",
+    "phone": "9767868686",
+    "targetExam": "Class 10th Board Foundation",
+    "plan": "foundation",
+    "status": "active",
+    "passwordHash": "b18dd9c9936ae7dc1aa076f3eda80473:aa574da68d4a598b99683d3edb3a6488e6ac76419b4446c2fda8e647ddd3dece5677f61d687a880717a6e45a6db0f94423a303ea6e932409189bda58f864249b",
+    "createdAt": "2026-11-13T05:54:25.338Z"
+  }
+]

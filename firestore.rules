@@ -1,0 +1,273 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwnerAdmin() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && (
+          request.auth.token.email == 'snroy963197@gmail.com'
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        );
+    }
+
+    function isValidPricingPlan(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'kicker', 'tierKey', 'monthlyInr', 'quarterlyInr', 'annualInr',
+          'monthlyUsd', 'quarterlyUsd', 'annualUsd', 'description', 'features', 'highlighted', 'order', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'kicker', 'tierKey', 'monthlyInr', 'quarterlyInr', 'annualInr',
+          'monthlyUsd', 'quarterlyUsd', 'annualUsd', 'description', 'features', 'highlighted', 'order', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 80
+        && data.kicker is string && data.kicker.size() >= 2 && data.kicker.size() <= 80
+        && data.tierKey in ['foundation', 'pro', 'scholar']
+        && data.monthlyInr is number && data.monthlyInr >= 0 && data.monthlyInr <= 500000
+        && data.quarterlyInr is number && data.quarterlyInr >= 0 && data.quarterlyInr <= 1500000
+        && data.annualInr is number && data.annualInr >= 0 && data.annualInr <= 5000000
+        && data.monthlyUsd is number && data.monthlyUsd >= 0 && data.monthlyUsd <= 10000
+        && data.quarterlyUsd is number && data.quarterlyUsd >= 0 && data.quarterlyUsd <= 30000
+        && data.annualUsd is number && data.annualUsd >= 0 && data.annualUsd <= 100000
+        && data.description is string && data.description.size() >= 4 && data.description.size() <= 280
+        && data.features is list && data.features.size() >= 1 && data.features.size() <= 10
+        && data.features[0] is string && data.features[0].size() <= 140
+        && data.highlighted is bool
+        && data.order is number && data.order >= 0 && data.order <= 100
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCourseTrack(data) {
+      return data.keys().hasAll([
+          'id', 'title', 'category', 'kicker', 'monthlyInr', 'fullCourseInr',
+          'monthlyUsd', 'fullCourseUsd', 'durationLabel', 'scheduleLabel',
+          'requiredTier', 'highlights', 'order', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'title', 'category', 'kicker', 'monthlyInr', 'fullCourseInr',
+          'monthlyUsd', 'fullCourseUsd', 'durationLabel', 'scheduleLabel',
+          'requiredTier', 'highlights', 'order', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 100
+        && data.category is string && data.category.size() >= 2 && data.category.size() <= 50
+        && data.kicker is string && data.kicker.size() >= 2 && data.kicker.size() <= 80
+        && data.monthlyInr is number && data.monthlyInr >= 0 && data.monthlyInr <= 500000
+        && data.fullCourseInr is number && data.fullCourseInr >= 0 && data.fullCourseInr <= 5000000
+        && data.monthlyUsd is number && data.monthlyUsd >= 0 && data.monthlyUsd <= 10000
+        && data.fullCourseUsd is number && data.fullCourseUsd >= 0 && data.fullCourseUsd <= 100000
+        && data.durationLabel is string && data.durationLabel.size() >= 2 && data.durationLabel.size() <= 60
+        && data.scheduleLabel is string && data.scheduleLabel.size() >= 2 && data.scheduleLabel.size() <= 80
+        && data.requiredTier in ['free', 'foundation', 'pro', 'scholar']
+        && data.highlights is list && data.highlights.size() >= 1 && data.highlights.size() <= 8
+        && data.highlights[0] is string && data.highlights[0].size() <= 140
+        && data.order is number && data.order >= 0 && data.order <= 100
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidLiveClass(data) {
+      return data.keys().hasAll([
+          'id', 'title', 'subject', 'instructor', 'batchTime', 'durationMinutes',
+          'status', 'requiredTier', 'seatsRemaining', 'topicNotes', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'title', 'subject', 'instructor', 'batchTime', 'durationMinutes',
+          'status', 'streamUrl', 'requiredTier', 'seatsRemaining', 'topicNotes', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 140
+        && data.subject is string && data.subject.size() >= 2 && data.subject.size() <= 60
+        && data.instructor is string && data.instructor.size() >= 2 && data.instructor.size() <= 80
+        && data.batchTime is string && data.batchTime.size() >= 2 && data.batchTime.size() <= 80
+        && data.durationMinutes is number && data.durationMinutes >= 5 && data.durationMinutes <= 480
+        && data.status in ['live', 'upcoming', 'ended']
+        && (!('streamUrl' in data) || (data.streamUrl is string && data.streamUrl.size() <= 500))
+        && data.requiredTier in ['free', 'foundation', 'pro', 'scholar']
+        && data.seatsRemaining is number && data.seatsRemaining >= 0 && data.seatsRemaining <= 5000
+        && data.topicNotes is string && data.topicNotes.size() >= 2 && data.topicNotes.size() <= 600
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidRecordedVideo(data) {
+      return data.keys().hasAll([
+          'id', 'title', 'subject', 'instructor', 'duration', 'videoUrl',
+          'isLocalUpload', 'requiredTier', 'description', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'title', 'subject', 'instructor', 'duration', 'videoUrl',
+          'isLocalUpload', 'requiredTier', 'description', 'createdAt'
+        ])
+        && isValidId(data.id)
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 140
+        && data.subject is string && data.subject.size() >= 2 && data.subject.size() <= 60
+        && data.instructor is string && data.instructor.size() >= 2 && data.instructor.size() <= 80
+        && data.duration is string && data.duration.size() >= 2 && data.duration.size() <= 30
+        && data.videoUrl is string && data.videoUrl.size() >= 2 && data.videoUrl.size() <= 500
+        && data.isLocalUpload is bool
+        && data.requiredTier in ['free', 'foundation', 'pro', 'scholar']
+        && data.description is string && data.description.size() >= 2 && data.description.size() <= 500
+        && data.createdAt is timestamp;
+    }
+
+    function isValidStudyPdf(data) {
+      return data.keys().hasAll([
+          'id', 'title', 'subject', 'chapter', 'fileUrl', 'fileName',
+          'fileSizeLabel', 'requiredTier', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'title', 'subject', 'chapter', 'fileUrl', 'fileName',
+          'fileSizeLabel', 'requiredTier', 'createdAt'
+        ])
+        && isValidId(data.id)
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 140
+        && data.subject is string && data.subject.size() >= 2 && data.subject.size() <= 60
+        && data.chapter is string && data.chapter.size() >= 1 && data.chapter.size() <= 80
+        && data.fileUrl is string && data.fileUrl.size() >= 2 && data.fileUrl.size() <= 500
+        && data.fileName is string && data.fileName.size() >= 2 && data.fileName.size() <= 180
+        && data.fileSizeLabel is string && data.fileSizeLabel.size() >= 2 && data.fileSizeLabel.size() <= 32
+        && data.requiredTier in ['free', 'foundation', 'pro', 'scholar']
+        && data.createdAt is timestamp;
+    }
+
+    function isValidAdminUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'email', 'role', 'createdAt'])
+        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.email is string && data.email.size() >= 5 && data.email.size() <= 160
+        && data.role == 'owner'
+        && data.createdAt is timestamp;
+    }
+
+    match /pricingPlans/{planId} {
+      allow get: if isValidId(planId);
+      allow list: if true;
+      allow create: if isOwnerAdmin()
+        && isValidId(planId)
+        && isValidPricingPlan(incoming())
+        && incoming().id == planId
+        && incoming().updatedAt == request.time;
+      allow update: if isOwnerAdmin()
+        && isValidId(planId)
+        && isValidPricingPlan(incoming())
+        && incoming().id == existing().id
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'kicker', 'tierKey', 'monthlyInr', 'quarterlyInr', 'annualInr',
+          'monthlyUsd', 'quarterlyUsd', 'annualUsd', 'description', 'features', 'highlighted', 'order', 'updatedAt'
+        ]);
+      allow delete: if isOwnerAdmin() && isValidId(planId);
+    }
+
+    match /courses/{courseId} {
+      allow get: if isValidId(courseId);
+      allow list: if true;
+      allow create: if isOwnerAdmin()
+        && isValidId(courseId)
+        && isValidCourseTrack(incoming())
+        && incoming().id == courseId
+        && incoming().updatedAt == request.time;
+      allow update: if isOwnerAdmin()
+        && isValidId(courseId)
+        && isValidCourseTrack(incoming())
+        && incoming().id == existing().id
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'category', 'kicker', 'monthlyInr', 'fullCourseInr',
+          'monthlyUsd', 'fullCourseUsd', 'durationLabel', 'scheduleLabel',
+          'requiredTier', 'highlights', 'order', 'updatedAt'
+        ]);
+      allow delete: if isOwnerAdmin() && isValidId(courseId);
+    }
+
+    match /liveClasses/{classId} {
+      allow get: if isValidId(classId);
+      allow list: if true;
+      allow create: if isOwnerAdmin()
+        && isValidId(classId)
+        && isValidLiveClass(incoming())
+        && incoming().id == classId
+        && incoming().updatedAt == request.time;
+      allow update: if isOwnerAdmin()
+        && isValidId(classId)
+        && isValidLiveClass(incoming())
+        && incoming().id == existing().id
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'subject', 'instructor', 'batchTime', 'durationMinutes',
+          'status', 'streamUrl', 'requiredTier', 'seatsRemaining', 'topicNotes', 'updatedAt'
+        ]);
+      allow delete: if isOwnerAdmin() && isValidId(classId);
+    }
+
+    match /recordedVideos/{videoId} {
+      allow get: if isValidId(videoId);
+      allow list: if true;
+      allow create: if isOwnerAdmin()
+        && isValidId(videoId)
+        && isValidRecordedVideo(incoming())
+        && incoming().id == videoId
+        && incoming().createdAt == request.time;
+      allow update: if isOwnerAdmin()
+        && isValidId(videoId)
+        && isValidRecordedVideo(incoming())
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'subject', 'instructor', 'duration', 'videoUrl',
+          'isLocalUpload', 'requiredTier', 'description'
+        ]);
+      allow delete: if isOwnerAdmin() && isValidId(videoId);
+    }
+
+    match /studyPdfs/{pdfId} {
+      allow get: if isValidId(pdfId);
+      allow list: if true;
+      allow create: if isOwnerAdmin()
+        && isValidId(pdfId)
+        && isValidStudyPdf(incoming())
+        && incoming().id == pdfId
+        && incoming().createdAt == request.time;
+      allow update: if isOwnerAdmin()
+        && isValidId(pdfId)
+        && isValidStudyPdf(incoming())
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'subject', 'chapter', 'fileUrl', 'fileName', 'fileSizeLabel', 'requiredTier'
+        ]);
+      allow delete: if isOwnerAdmin() && isValidId(pdfId);
+    }
+
+    match /admins/{uid} {
+      allow get: if isOwnerAdmin() && isValidId(uid);
+      allow list: if isOwnerAdmin() && resource.data.email == request.auth.token.email;
+      allow create: if isOwnerAdmin()
+        && isValidAdminUser(incoming())
+        && incoming().uid == request.auth.uid
+        && incoming().email == request.auth.token.email
+        && incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+  }
+}

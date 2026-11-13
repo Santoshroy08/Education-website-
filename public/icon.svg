@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Radha Education App Icon">
+  <rect width="512" height="512" rx="96" fill="#09090B" />
+  <rect x="28" y="28" width="456" height="456" rx="76" fill="none" stroke="#27272A" stroke-width="6" />
+  <rect x="64" y="108" width="22" height="296" rx="4" fill="#E11D2E" />
+  <path d="M126 118h104c52 0 86 30 86 76 0 36-21 63-55 72l62 128h-58l-56-120h-31v120h-52V118zm52 44v68h47c24 0 39-13 39-34s-15-34-39-34h-47z" fill="#FFFFFF" />
+  <path d="M348 118h100v46h-48v64h42v45h-42v75h50v46H348V118z" fill="#E11D2E" />
+</svg>

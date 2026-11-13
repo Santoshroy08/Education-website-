@@ -1,0 +1,142 @@
+{
+  "entities": {
+    "PricingPlan": {
+      "title": "PricingPlan",
+      "description": "Subscription and cohort pricing plans managed exclusively by the site owner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "kicker": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "tierKey": { "type": "string", "enum": ["foundation", "pro", "scholar"] },
+        "monthlyInr": { "type": "number" },
+        "quarterlyInr": { "type": "number" },
+        "annualInr": { "type": "number" },
+        "monthlyUsd": { "type": "number" },
+        "quarterlyUsd": { "type": "number" },
+        "annualUsd": { "type": "number" },
+        "description": { "type": "string", "minLength": 4, "maxLength": 280 },
+        "features": { "type": "array", "maxLength": 10 },
+        "highlighted": { "type": "boolean" },
+        "order": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "kicker", "tierKey", "monthlyInr", "quarterlyInr", "annualInr", "monthlyUsd", "quarterlyUsd", "annualUsd", "description", "features", "highlighted", "order", "updatedAt"]
+    },
+    "CourseTrack": {
+      "title": "CourseTrack",
+      "description": "Specific academic and skill courses (Class 10th, Class 12th, Computer Basic) with course fees and schedules.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "category": { "type": "string", "minLength": 2, "maxLength": 50 },
+        "kicker": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "monthlyInr": { "type": "number" },
+        "fullCourseInr": { "type": "number" },
+        "monthlyUsd": { "type": "number" },
+        "fullCourseUsd": { "type": "number" },
+        "durationLabel": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "scheduleLabel": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "requiredTier": { "type": "string", "enum": ["free", "foundation", "pro", "scholar"] },
+        "highlights": { "type": "array", "maxLength": 8 },
+        "order": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "category", "kicker", "monthlyInr", "fullCourseInr", "monthlyUsd", "fullCourseUsd", "durationLabel", "scheduleLabel", "requiredTier", "highlights", "order", "updatedAt"]
+    },
+    "LiveClass": {
+      "title": "LiveClass",
+      "description": "Live interactive cohort sessions scheduled and operated by the owner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "subject": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "instructor": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "batchTime": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "durationMinutes": { "type": "number" },
+        "status": { "type": "string", "enum": ["live", "upcoming", "ended"] },
+        "streamUrl": { "type": "string", "maxLength": 500 },
+        "requiredTier": { "type": "string", "enum": ["free", "foundation", "pro", "scholar"] },
+        "seatsRemaining": { "type": "number" },
+        "topicNotes": { "type": "string", "minLength": 2, "maxLength": 600 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "subject", "instructor", "batchTime", "durationMinutes", "status", "requiredTier", "seatsRemaining", "topicNotes", "updatedAt"]
+    },
+    "RecordedVideo": {
+      "title": "RecordedVideo",
+      "description": "Recorded lecture video library entries uploaded or linked by the owner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "subject": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "instructor": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "duration": { "type": "string", "minLength": 2, "maxLength": 30 },
+        "videoUrl": { "type": "string", "minLength": 2, "maxLength": 500 },
+        "isLocalUpload": { "type": "boolean" },
+        "requiredTier": { "type": "string", "enum": ["free", "foundation", "pro", "scholar"] },
+        "description": { "type": "string", "minLength": 2, "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "subject", "instructor", "duration", "videoUrl", "isLocalUpload", "requiredTier", "description", "createdAt"]
+    },
+    "StudyPdf": {
+      "title": "StudyPdf",
+      "description": "Uploaded PDF notes, practice sheets, and lecture slides managed by the owner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "subject": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "chapter": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "fileUrl": { "type": "string", "minLength": 2, "maxLength": 500 },
+        "fileName": { "type": "string", "minLength": 2, "maxLength": 180 },
+        "fileSizeLabel": { "type": "string", "minLength": 2, "maxLength": 32 },
+        "requiredTier": { "type": "string", "enum": ["free", "foundation", "pro", "scholar"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "subject", "chapter", "fileUrl", "fileName", "fileSizeLabel", "requiredTier", "createdAt"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Explicit owner-admin allowlist entry.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "minLength": 5, "maxLength": 160 },
+        "role": { "type": "string", "enum": ["owner"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/pricingPlans/{planId}": {
+      "schema": { "$ref": "#/entities/PricingPlan" },
+      "description": "Publicly readable pricing tiers; writable only by the verified owner."
+    },
+    "/courses/{courseId}": {
+      "schema": { "$ref": "#/entities/CourseTrack" },
+      "description": "Publicly readable course catalog (Class 10th, Class 12th, Computer Basic); writable only by the verified owner."
+    },
+    "/liveClasses/{classId}": {
+      "schema": { "$ref": "#/entities/LiveClass" },
+      "description": "Live class schedule and active session metadata; writable only by the verified owner."
+    },
+    "/recordedVideos/{videoId}": {
+      "schema": { "$ref": "#/entities/RecordedVideo" },
+      "description": "Recorded lecture video catalog; writable only by the verified owner."
+    },
+    "/studyPdfs/{pdfId}": {
+      "schema": { "$ref": "#/entities/StudyPdf" },
+      "description": "Study PDF metadata catalog; writable only by the verified owner."
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Owner admin lookup records."
+    }
+  }
+}
